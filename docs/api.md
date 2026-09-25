@@ -48,7 +48,7 @@ decrypt. Consequently:
 - `GET  /v1/wallets` — list your wallets (paginated).
 - `GET  /v1/wallets/{id}` — wallet details.
 - `GET  /v1/wallets/{id}/balances` — live on-chain balances.
-- `GET  /v1/wallets/{id}/transactions` — deposits + outbound transfers (paginated).
+- `GET  /v1/wallets/{id}/transactions` — deposits + outbound transfers (paginated, optional `?direction=deposit|withdrawal`).
 - `GET  /v1/wallets/{id}/backup` — the opaque client-encrypted backup blob, for new-device
   recovery. **Dashboard JWT only.** Useless without the user's password.
 

@@ -155,6 +155,20 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: limit
+          in: query
+          schema:
+            type: integer
+        - name: before
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: direction
+          in: query
+          schema:
+            type: string
+            enum: [deposit, withdrawal]
       responses:
         "200":
           description: OK

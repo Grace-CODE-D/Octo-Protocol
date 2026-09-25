@@ -829,45 +829,33 @@ impl Store {
         limit: i64,
         before_id: Option<Uuid>,
     ) -> Result<Vec<Transaction>, StoreError> {
-        let rows = sqlx::query_as::<_, Transaction>(
-            r#"
-            SELECT * FROM transactions
-            WHERE wallet_id = $1
-              AND ($2::uuid IS NULL OR (created_at, id) < (
-                  SELECT created_at, id FROM transactions WHERE id = $2
-              ))
-            ORDER BY created_at DESC, id DESC
-            LIMIT $3
-            "#,
-        )
-        .bind(wallet_id)
-        .bind(before_id)
-        .bind(limit)
-        .fetch_all(&self.pool)
-        .await?;
-        Ok(rows)
+        self.list_transactions_page(wallet_id, limit, None, before_id).await
     }
 
-    /// Paginated version of [`list_transactions`]: returns at most `limit` rows, newest first.
+    /// Paginated version of [`list_transactions`]: returns at most `limit` rows, newest first,
+    /// with optional direction filter (`deposit` | `withdrawal`).
     /// Pass the last page's final transaction id as `before_id` to fetch the next page.
     pub async fn list_transactions_page(
         &self,
         wallet_id: Uuid,
         limit: i64,
+        direction: Option<&str>,
         before_id: Option<Uuid>,
     ) -> Result<Vec<Transaction>, StoreError> {
         let rows = sqlx::query_as::<_, Transaction>(
             r#"
             SELECT * FROM transactions
             WHERE wallet_id = $1
-              AND ($2::uuid IS NULL OR (created_at, id) < (
-                    SELECT created_at, id FROM transactions WHERE id = $2
-                  ))
+              AND ($2::text IS NULL OR direction = $2)
+              AND ($3::uuid IS NULL OR (created_at, id) < (
+                  SELECT created_at, id FROM transactions WHERE id = $3
+              ))
             ORDER BY created_at DESC, id DESC
-            LIMIT $3
+            LIMIT $4
             "#,
         )
         .bind(wallet_id)
+        .bind(direction)
         .bind(before_id)
         .bind(limit)
         .fetch_all(&self.pool)
