@@ -108,7 +108,7 @@ so it cannot escalate or revoke itself.
 ## Audit logs
 
 - `GET /v1/audit-logs` — your account's activity, filterable by `category` and a free-text
-  `search`.
+  `search`. Valid categories: `authentication`, `wallet`, `address`, `credentials`, `configuration`, `sponsorship`.
 
 ## Conventions
 
