@@ -182,6 +182,12 @@ pub fn validated_limit(limit: Option<i64>) -> Result<i64, ApiError> {
 }
 
 /// `POST /v1/wallets` — create a master wallet for the authenticated user.
+///
+/// Ownership invariant: client-custody wallet registration strictly enforces cryptographic
+/// ownership verification before creating or activating the wallet row. Every call must provide
+/// a server-issued challenge (from `GET /v1/wallets/challenge`) and a valid Ed25519 signature
+/// matching `public_key`. The signature is verified inline via `verify_ownership` prior to any
+/// database insertion, preventing unverified or spoofed public keys from being registered.
 pub async fn create_wallet(
     State(state): State<AppState>,
     headers: HeaderMap,
